@@ -90,7 +90,7 @@ export default function Command() {
         setFileData(cachedData);
       }
 
-      if (typeof cachedData.__cacheTime === "number" && currentTime - cachedData.__cacheTime < 1000 * 120) {
+      if (typeof cachedData.__cacheTime === "number" && currentTime - cachedData.__cacheTime < 1000 * 60) {
         return;
       }
 
