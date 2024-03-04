@@ -1,8 +1,8 @@
-import { ActionPanel, List, Action, LocalStorage, open, getPreferenceValues } from "@raycast/api";
+import { Action, ActionPanel, getPreferenceValues, List, LocalStorage, open } from "@raycast/api";
 import { useEffect, useState } from "react";
 import fetch from "node-fetch";
 import { Octokit } from "octokit";
-import { log } from "console";
+
 export type TabInfo = {
   id: number;
   title: string;
@@ -29,8 +29,10 @@ export type GroupInfo = {
   subSpacesIds: string[];
 };
 
+type GroupMap = Record<string, GroupInfo>;
+
 export type StoreType = {
-  selectedIndex: number;
+  selectedGroupId: string;
 
   allSpacesMap: {
     [key: string]: SpaceInfo;
@@ -38,14 +40,17 @@ export type StoreType = {
 
   groups: GroupInfo[];
 
-  archiveSpaces?: {
-    spaceIds: string[];
-  };
+  groupsSort: string[];
+  groupsMap: GroupMap;
+
+  archiveSpaces?: GroupInfo;
 
   // 每次同步完成后，更新版本号
   version: number;
 
   alreadyBackupToGist?: boolean;
+
+  redirect?: boolean;
 };
 
 type Preference = {
@@ -110,14 +115,12 @@ export default function Command() {
     });
   }, []);
 
-  console.log("fileData", fileData);
-
   return (
     <List>
-      {fileData?.groups.map((group) => {
+      {Object.values(fileData?.groupsMap || {}).map((group) => {
         return group.subSpacesIds.map((spaceId) => {
           const space = fileData?.allSpacesMap[spaceId];
-          return space.tabs.map((tab) => {
+          return space?.tabs.map((tab) => {
             return (
               <List.Item
                 key={tab.id}
