@@ -85,6 +85,8 @@ export const getGistData = async ({ filename }: { filename: string }): Promise<S
 
 export default function Command() {
   const [fileData, setFileData] = useState<StoreType>();
+  const [searchText, setSearchText] = useState<string>("");
+
   useEffect(() => {
     const SYNC_FILE_NAME = "sync_data.json";
     LocalStorage.getItem("data").then((data) => {
@@ -116,16 +118,23 @@ export default function Command() {
   }, []);
 
   return (
-    <List>
+    <List filtering={false} searchText={searchText} onSearchTextChange={setSearchText}>
       {Object.values(fileData?.groupsMap || {}).map((group) => {
         return group.subSpacesIds.map((spaceId) => {
           const space = fileData?.allSpacesMap[spaceId];
-          return space?.tabs.map((tab) => {
+          return space?.tabs.filter(tab => {
+            const lowerCaseTitle = tab.title.toLowerCase();
+            const lowerCaseSpaceName = (space?.name || '').toLowerCase();
+            const lowerSearchText = searchText.toLowerCase();
+
+            return (lowerCaseTitle).includes(lowerSearchText) || lowerCaseSpaceName.includes(lowerSearchText);
+          }).map((tab) => {
             return (
               <List.Item
                 key={tab.id}
                 title={tab.title}
                 icon={tab.favIconUrl}
+                keywords={[group.name, space?.name]}
                 accessories={[
                   {
                     text: group.name + "/" + space.name,
@@ -137,12 +146,12 @@ export default function Command() {
                     <Action
                       title=""
                       onAction={() => {
-                        // open(`chrome-extension://bcpiihgpkjpbehkdkeoalgnknfjlkffc/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`, "com.google.Chrome");
+                        open(`chrome-extension://bcpiihgpkjpbehkdkeoalgnknfjlkffc/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`, "com.google.Chrome");
                         // open in edge browser
-                        open(
-                          `chrome-extension://bcpiihgpkjpbehkdkeoalgnknfjlkffc/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`,
-                          "com.microsoft.edgemac",
-                        );
+                        // open(
+                        //   `chrome-extension://bcpiihgpkjpbehkdkeoalgnknfjlkffc/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`,
+                        //   "com.microsoft.edgemac",
+                        // );
                       }}
                     />
                   </ActionPanel>
