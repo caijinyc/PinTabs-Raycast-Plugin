@@ -25,7 +25,7 @@ export const usePinTabData = () => {
         setCacheIconData(storageIconData);
       }
 
-      if (typeof storageStoreData.__cacheTime === "number" && currentTime - storageStoreData.__cacheTime < 1000 * 60) {
+      if (typeof storageStoreData.__cacheTime === "number" && currentTime - storageStoreData.__cacheTime < 1000 * 30) {
         return;
       }
 
