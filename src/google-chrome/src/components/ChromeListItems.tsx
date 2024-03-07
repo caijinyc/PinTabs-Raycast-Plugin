@@ -22,13 +22,21 @@ function HistoryItem({ profile, entry: { url, title, id } }: { entry: HistoryEnt
 }
 
 function TabListItem(props: { tab: Tab; useOriginalFavicon: boolean; onTabClosed?: () => void }) {
+  let rightText = props.tab.urlWithoutScheme().split('/')[0];
+
+  if (props.tab.urlWithoutScheme().startsWith('chrome-extension://')) {
+    rightText = 'chrome-extension';
+  }
+
   return (
     <List.Item
       title={props.tab.title.slice(0, 60)}
       // subtitle={props.tab.urlWithoutScheme().split('/')[0]}
       accessories={[
         {
-          text: props.tab.urlWithoutScheme().split('/')[0],
+          text: {
+            value: rightText,
+          },
         },
       ]}
       keywords={[props.tab.urlWithoutScheme()]}

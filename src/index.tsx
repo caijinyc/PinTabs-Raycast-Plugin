@@ -42,7 +42,10 @@ export default function Command() {
                   keywords={[group.name, space?.name]}
                   accessories={[
                     {
-                      text: group.name + "/" + space.name,
+                      tag: {
+                        value: group.name + "/" + space.name,
+                        color: "gray",
+                      },
                     },
                   ]}
                   // open in browser
