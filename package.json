@@ -30,6 +30,13 @@
       "title": "GistToken"
     },
     {
+      "name": "ExtensionID",
+      "type": "textfield",
+      "description": "Extension ID",
+      "required": false,
+      "title": "ExtensionID(DEV_ONLY)"
+    },
+    {
       "name": "DefaultBrowser",
       "type": "dropdown",
       "data": [

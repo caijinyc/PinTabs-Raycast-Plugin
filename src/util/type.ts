@@ -4,6 +4,7 @@ export type PreferenceOptions = {
   GistToken: string;
   GistId: string;
   DefaultBrowser: (typeof DefaultBrowser)[keyof typeof DefaultBrowser];
+  ExtensionID: string
 };
 
 export type TabInfo = {

@@ -9,6 +9,8 @@ export default function Command() {
   const [searchText, setSearchText] = useState<string>("");
   const { fileData, cacheIconData } = usePinTabData();
   const { data } = useTabSearch();
+  const preferences = getPreferenceValues<PreferenceOptions>();
+
 
   return (
     <List filtering={false} searchText={searchText} onSearchTextChange={setSearchText}>
@@ -55,7 +57,7 @@ export default function Command() {
                         title=""
                         onAction={() => {
                           open(
-                            `chrome-extension://bcpiihgpkjpbehkdkeoalgnknfjlkffc/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`,
+                            `chrome-extension://${preferences.ExtensionID ? preferences.ExtensionID : 'mpjgigpdepkhfkgjcjnelffdnimeomao'}/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`,
                             BrowserMapApplication[getPreferenceValues<PreferenceOptions>().DefaultBrowser] ||
                               BrowserMapApplication.chrome,
                           );
