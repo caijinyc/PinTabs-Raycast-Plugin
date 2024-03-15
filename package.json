@@ -9,8 +9,8 @@
   "commands": [
     {
       "name": "index",
-      "title": "Show List and Detail",
-      "description": "Template for showing a static list and a detail view",
+      "title": "Find Pin Tabs & Active Tabs",
+      "description": "find pin tabs & active tabs",
       "mode": "view"
     }
   ],
