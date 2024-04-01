@@ -2,9 +2,10 @@ import { Action, ActionPanel, getPreferenceValues, List, open } from "@raycast/a
 import { useState } from "react";
 import { useTabSearch } from "./google-chrome/src/hooks/useTabSearch";
 import { ChromeListItems } from "./google-chrome/src/components";
-import { PreferenceOptions } from "./util/type";
+import { PreferenceOptions, SpaceInfo } from "./util/type";
 import { BrowserMapApplication } from "./util/constant";
 import { usePinTabData } from "./util/use-pin-tab-data";
+
 export default function Command() {
   const [searchText, setSearchText] = useState<string>("");
   const { fileData, cacheIconData } = usePinTabData();
@@ -24,13 +25,20 @@ export default function Command() {
       {/*    })*/}
       {/*    .map((tab) => <ChromeListItems.TabList key={tab.key()} tab={tab} useOriginalFavicon={false} />)}*/}
 
-      {Object.values(fileData?.groupsMap || {}).map((group) => {
-        return group.subSpacesIds.filter(item => {
+      {
+        Object.values(fileData?.allSpacesMap || {}).filter((space) => {
           const archivedSpaceIds = fileData?.groupsMap['__archive']?.subSpacesIds || [];
 
-          return !archivedSpaceIds.includes(item);
-        }).map((spaceId) => {
-          const space = fileData?.allSpacesMap[spaceId];
+          return !archivedSpaceIds.includes(space.uuid);
+        }).sort((a, b) => {
+          const getOpenCountSum = (space: SpaceInfo) => {
+            return space.tabs.reduce((acc, tab) => {
+              return acc + (tab.openCount || 0);
+            }, 0) || 0
+          }
+          return getOpenCountSum(b) - getOpenCountSum(a);
+        }).map((space) => {
+          const group = Object.values(fileData?.groupsMap || {}).find(g => g.subSpacesIds.includes(space.uuid));
 
           return space?.tabs
             .filter((tab) => {
@@ -48,11 +56,11 @@ export default function Command() {
                   key={tab.id}
                   title={tab.title}
                   icon={cacheIconData[tab.favIconUrl] || tab.favIconUrl}
-                  keywords={[group.name, space?.name]}
+                  keywords={[group?.name || '', space?.name]}
                   accessories={[
                     {
                       tag: {
-                        value: group.name + "/" + space.name +  (tab.openCount ? `-${tab.openCount} ` : ''),
+                        value: group?.name + "/" + space.name +  (tab.openCount ? `-${tab.openCount} ` : ''),
                         color: "gray",
                       },
                     },
@@ -66,7 +74,7 @@ export default function Command() {
                           open(
                             `chrome-extension://${preferences.ExtensionID ? preferences.ExtensionID : 'mpjgigpdepkhfkgjcjnelffdnimeomao'}/src/pages/newtab/index.html?spaceId=${spaceId}&tabId=${tab.id}`,
                             BrowserMapApplication[getPreferenceValues<PreferenceOptions>().DefaultBrowser] ||
-                              BrowserMapApplication.chrome,
+                            BrowserMapApplication.chrome,
                           );
                         }}
                       />
@@ -75,8 +83,21 @@ export default function Command() {
                 />
               );
             });
-        });
-      })}
+
+        })
+      }
+
+      {/*{Object.values(fileData?.groupsMap || {}).map((group) => {*/}
+      {/*  return group.subSpacesIds.filter(item => {*/}
+      {/*    const archivedSpaceIds = fileData?.groupsMap['__archive']?.subSpacesIds || [];*/}
+
+      {/*    return !archivedSpaceIds.includes(item);*/}
+      {/*  }).map((spaceId) => {*/}
+      {/*    const space = fileData?.allSpacesMap[spaceId];*/}
+      {/*    console.log(space?.name)*/}
+
+      {/*  });*/}
+      {/*})}*/}
     </List>
   );
 }
