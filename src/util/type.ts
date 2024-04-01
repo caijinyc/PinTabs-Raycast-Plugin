@@ -17,6 +17,7 @@ export type TabInfo = {
   active?: boolean;
   groupId?: number;
   pinned?: boolean;
+  openCount?: number;
 };
 
 export type SpaceInfo = {

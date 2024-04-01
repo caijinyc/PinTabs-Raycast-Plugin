@@ -14,19 +14,24 @@ export default function Command() {
 
   return (
     <List filtering={false} searchText={searchText} onSearchTextChange={setSearchText}>
-      {searchText &&
-        data
-          .filter((tab) => {
-            return (
-              tab.title.toLowerCase().includes(searchText.toLowerCase()) ||
-              tab.url.toLowerCase().includes(searchText.toLowerCase())
-            );
-          })
-          .map((tab) => <ChromeListItems.TabList key={tab.key()} tab={tab} useOriginalFavicon={false} />)}
+      {/*{searchText &&*/}
+      {/*  data*/}
+      {/*    .filter((tab) => {*/}
+      {/*      return (*/}
+      {/*        tab.title.toLowerCase().includes(searchText.toLowerCase()) ||*/}
+      {/*        tab.url.toLowerCase().includes(searchText.toLowerCase())*/}
+      {/*      );*/}
+      {/*    })*/}
+      {/*    .map((tab) => <ChromeListItems.TabList key={tab.key()} tab={tab} useOriginalFavicon={false} />)}*/}
 
       {Object.values(fileData?.groupsMap || {}).map((group) => {
-        return group.subSpacesIds.map((spaceId) => {
+        return group.subSpacesIds.filter(item => {
+          const archivedSpaceIds = fileData?.groupsMap['__archive']?.subSpacesIds || [];
+
+          return !archivedSpaceIds.includes(item);
+        }).map((spaceId) => {
           const space = fileData?.allSpacesMap[spaceId];
+
           return space?.tabs
             .filter((tab) => {
               const lowerCaseTitle = tab.title.toLowerCase();
@@ -34,6 +39,8 @@ export default function Command() {
               const lowerSearchText = searchText.toLowerCase();
 
               return lowerCaseTitle.includes(lowerSearchText) || lowerCaseSpaceName.includes(lowerSearchText);
+            }).sort((a, b) => {
+              return (b.openCount || 0) - (a.openCount || 0);
             })
             .map((tab) => {
               return (
@@ -45,7 +52,7 @@ export default function Command() {
                   accessories={[
                     {
                       tag: {
-                        value: group.name + "/" + space.name,
+                        value: group.name + "/" + space.name +  (tab.openCount ? `-${tab.openCount} ` : ''),
                         color: "gray",
                       },
                     },
